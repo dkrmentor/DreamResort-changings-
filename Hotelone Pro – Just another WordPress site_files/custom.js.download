@@ -1,0 +1,176 @@
+
+/* Custom JS
+----------------------------------------------------------------*/
+jQuery(document).ready(function ($) {
+
+	'use strict';
+
+	$('.theme_mobile_container nav').meanmenu({
+		meanScreenWidth: 990,
+        meanMenuContainer: ".theme_mobile_container",
+        meanMenuOpen: "<span></span><span></span><span></span>",
+        onePage: true,
+        meanRevealPosition: "center",
+    });
+	
+	/* Menu dropdown on hover
+	----------------------------------------------------------------*/
+	$('.nav li.dropdown').hover(function() {
+		   $(this).addClass('open');
+	   }, function() {
+		   $(this).removeClass('open');
+	   });
+	$('li.dropdown').on('click', function() {
+			var $el = $(this);
+			if ($el.hasClass('open')) {
+				var $a = $el.children('a.dropdown-toggle');
+				if ($a.length && $a.attr('href')) {
+					location.href = $a.attr('href');
+				}
+			}
+		});
+	   
+	   
+	/* client section
+	----------------------------------------------------------------*/
+	
+	$('.owl-carousel').owlCarousel({
+		slideSpeed : 300,
+		animateIn: "",
+		animateOut: "",
+		autoplay : 7000,
+		smartSpeed: 1000,
+		autoplayTimeout: 2500,
+		autoplayHoverPause: true,
+		singleItem: true,
+		mouseDrag: true,
+		loop: true,
+		margin: 10,
+		nav: true,
+		autoHeight: true,
+		responsiveClass:true, // Optional helper class. Add 'owl-reponsive-' + 'breakpoint' class to main element.
+		//items: 1,
+		dots: true,
+		navText: ["<i class='fa fa-long-arrow-left'></i>","<i class='fa fa-long-arrow-right'></i>"],
+		responsive:{
+			100:{ items: 1 },	
+			480:{ items: 2 },
+			768:{ items: 3 },
+			1000:{ items: hotelone_settings.client_no_of_show }
+		}
+	});
+
+	/* video section
+	----------------------------------------------------------------*/
+    $(".video_lightbox .popup-video").swipebox();
+	
+	/* Gallery Page
+	----------------------------------------------------------------*/
+    $(".galleryPage").lightGallery({
+		selector: '.gallerythumb'
+	});
+	
+	/* Room Page
+	----------------------------------------------------------------*/
+    $(".room_overlay").lightGallery({
+		selector: '.roomimage'
+	});
+	
+	if( hotelone_settings.disable_automation_effect_counters != true ){
+		/* Counter
+		----------------------------------------------------------------*/
+	    $('.counter_count').counterUp({
+	        delay: 10,
+	        time: 1000
+	    });
+	}
+
+	var adminbarheight = function(){
+        var height = 0;
+        if ( $( '#wpadminbar' ).length ) {
+            if ( $( '#wpadminbar' ).css('position') == 'fixed' ) {
+                height = $( '#wpadminbar' ).height();
+            }
+        }
+        return height;
+    };
+	
+	function fullscreenSlider( no_trigger ){
+        if ( $( '#hero_carousel').length > 0 ) {
+            var window_h = $(window).height();
+            var top = adminbarheight();
+            var $header = $('.header');
+            var is_transparent = $header.hasClass('is-t');
+            var header_h;
+            if ( is_transparent ) {
+                header_h = 0;
+            } else {
+                //header_h = $header.height();
+                var headertop_h = $('.header-top').outerHeight();
+                var navbar_h = $('.hotelone_nav').outerHeight();
+                header_h = headertop_h + navbar_h;
+            }
+            header_h += top;
+            //jQuery('#hero_carousel .slide_image').css({'height':( window_h - header_h + 1) + 'px','width':'100%'});
+            if (  typeof  no_trigger === "undefined" || ! no_trigger ) {
+                //$document.trigger( 'hero_init' );
+            }
+
+        }
+    }
+
+    $(window).resize( function (){
+        fullscreenSlider();
+    });
+	
+    fullscreenSlider();
+
+    $(document).on( 'header_view_changed', function(){
+        fullscreenSlider();
+    } );
+
+    // isotope js
+
+	var recipe_isotop = $('.recipe-isotop').isotope({
+		itemSelector: '.recipe-item',
+		layoutMode: 'masonry',
+		transitionDuration: '0.8s',
+		hiddenStyle: {
+			opacity: 0
+		},
+		visibleStyle: {
+			opacity: 1
+		}
+	});
+
+	var filterisotop = {
+		numberGreaterThan50: function() {
+			var number = $(this).find('.number').text();
+			return parseInt( number, 10 ) > 50;
+		},
+		ium: function() {
+			var name = $(this).find('.name').text();
+			return name.match( /ium$/ );
+		}
+	};
+
+	$('.theme-nav').on( 'click', 'a', function() {
+		var dataValue = $( this ).attr('data-filter');
+
+		dataValue = filterisotop[ dataValue ] || dataValue;
+		recipe_isotop.isotope({ filter: dataValue });
+	});
+
+	$('.theme-nav').each( function( i, theme_nav_group ) {
+		var theme_nav_group_ul = $( theme_nav_group );
+		theme_nav_group_ul.on( 'click', 'a', function() {
+			theme_nav_group_ul.find('.active').removeClass('active');
+			$( this ).addClass('active');
+		});
+	});
+	
+});	
+
+if( hotelone_settings.disable_animations != true ){
+			new WOW().init();
+		}
